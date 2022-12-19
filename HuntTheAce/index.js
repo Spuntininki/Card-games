@@ -6,7 +6,12 @@ const CardsCollectionObjects = [
 ]
 
 const backImagePath = 'imgs/card-back-blue.png';
-const cardContainer = document.querySelector(".card-container")
+const cardContainer = document.querySelector(".card-container");
+
+
+let cards = []
+
+const playGameButton = document.getElementById('playGame');
 
 /*
     A função escrita abaixo (createCard) tem o intuito de criar a estrutura HTML abaixo.
@@ -23,7 +28,39 @@ const cardContainer = document.querySelector(".card-container")
 </div>
 
 */
-createCards()
+
+loadGame()
+
+
+
+function loadGame(){
+    createCards()
+
+    cards = document.querySelectorAll('.card')
+    console.log(cards)
+    playGameButton.addEventListener("click", () => StartGame())
+
+}
+
+
+function StartGame() {
+    alert('Bruce e billy')
+}
+
+function initializeNewGame() {
+
+}
+
+function startRoud() {
+    initializeNewRound();
+
+}
+
+function initializeNewRound() {
+
+}
+
+
 
 function createCards() {
 
@@ -104,7 +141,6 @@ function addChildElement(parentElem, childElem) {
 
 function addCardToGridCell(card){
     const cardPositionClassName = mapCardIdToGridCell(card);
-    console.log(cardPositionClassName)
     const cardPosElem = document.querySelector(cardPositionClassName);
     
     addChildElement(cardPosElem, card);
