@@ -12,6 +12,11 @@ const cardContainer = document.querySelector(".card-container");
 let cards = []
 
 const playGameButton = document.getElementById('playGame');
+const collapsedGridAreaTemplate = '"a a" "a a"';
+const cardCollectionCellClass = ".card-pos-a";
+
+const numberOfCards = CardsCollectionObjects.length;
+const cardPositions = [];
 
 /*
     A função escrita abaixo (createCard) tem o intuito de criar a estrutura HTML abaixo.
@@ -44,23 +49,140 @@ function loadGame(){
 
 
 function StartGame() {
-    alert('Bruce e billy')
+    initializeNewGame();
+    startRound();
 }
 
 function initializeNewGame() {
 
 }
 
-function startRoud() {
+function startRound() {
     initializeNewRound();
+    colectCards();
+    //flipAllCards(true);
+    shuffleCards();
 
 }
 
 function initializeNewRound() {
 
+    
+
+}
+
+function colectCards(){
+    transformGridArea(collapsedGridAreaTemplate);
+    addCardsToShuffleArea(cardCollectionCellClass);
+}
+
+function transformGridArea(areas){
+
+    cardContainer.style.gridTemplateAreas = areas;
 }
 
 
+function flipCard(card, flipToBack) {
+    const innerCardElem = card.firstChild;
+
+    if (flipToBack && !innerCardElem.classList.contains('flip-it'))
+    {
+        innerCardElem.classList.add('flip-it');
+        
+    }
+    else if(innerCardElem.classList.contains('flip-it')) {
+        innerCardElem.classList.remove('flip-it');
+    }
+
+}
+
+function flipAllCards(flipToBack){
+    cards.forEach((card, index) => {
+        setTimeout(() => {
+            flipCard(card, flipToBack)
+        }, index * 100);
+    })
+}
+
+function addCardsToShuffleArea(cellPositionName) {
+    const cellPositionElem = document.querySelector(cellPositionName);
+    console.log(cellPositionElem);
+    cards.forEach((card, index) => {
+        addChildElement(cellPositionElem, card);
+    }  
+    )
+}
+//iteração responsável pela randomização. Obs a iteração está sendo baseada no metodo "setInterval"
+function shuffleCards(){
+
+    const shuffleInterval = setInterval(shuffle, 12);
+    let shuffleCount = 0
+
+    function shuffle(){
+        randomizeCardsPositions();
+
+
+        if(shuffleCount == 500){
+            clearInterval(shuffleInterval);
+            dealCards();
+        }
+        else {
+            shuffleCount++;
+        }
+    }
+
+
+
+}
+//algoritimo para randomizar as posições
+function randomizeCardsPositions(){
+    const random1 = Math.floor(Math.random() * numberOfCards) + 1
+    const random2 = Math.floor(Math.random() * numberOfCards) + 1
+
+    const temp = cardPositions[random1 - 1]
+
+    cardPositions[random1 - 1] = cardPositions[random2 - 1]
+    cardPositions[random2 - 1] = temp
+}
+
+function dealCards(){
+    addCardsToAppropriateCell();
+    const areaTemplate = returnGridAreasMappedToCardOriginalPos();
+    console.log(areaTemplate)
+    transformGridArea(areaTemplate);
+}
+
+function returnGridAreasMappedToCardOriginalPos() {
+    let firstPartOfTheMapString = ""
+    let secondPartOfTheMapString = ""
+    let areas = ""
+
+    cards.forEach((card, index) => {
+        if(cardPositions[index] == 1){
+            areas += "a ";
+        }else if(cardPositions[index] == 2){
+            areas += "b ";
+        }else if(cardPositions[index] == 3){
+            areas += "c ";
+        }else if(cardPositions[index] == 4){
+            areas += "d ";
+        }if(index == 1) {
+            firstPartOfTheMapString = areas.substring(0, areas.length - 1);
+            areas = "";
+        } else if (index == 3) {
+            secondPartOfTheMapString = areas.substring(0, areas.length - 1);
+        }
+
+        return `"${firstPartOfTheMapString}" "${secondPartOfTheMapString}"`
+    })
+}
+
+function addCardsToAppropriateCell(){
+    cards.forEach((card) => {
+        addCardToGridCell(card);
+    })
+
+}
 
 function createCards() {
 
@@ -114,10 +236,16 @@ function createCard(cardItem) {
 
 
     //adiciona a carta na div de posição (a, b, c, d.. etc).
-    addCardToGridCell(cardElem)
+    addCardToGridCell(cardElem);
+
+
+    initializeCardPositions(cardElem);
 
 }
-
+function initializeCardPositions(card){
+    cardPositions.push(card.id)
+    
+}
 
 function createElem(elemType) {
     return document.createElement(elemType);
