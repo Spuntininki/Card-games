@@ -17,3 +17,6 @@ console.log(random2)
 
 
 console.log(Math.floor(4.6) + 1)
+
+a = Math.floor(4.6) + 1
+console.log(`${a}`)

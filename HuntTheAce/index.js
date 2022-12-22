@@ -5,11 +5,25 @@ const CardsCollectionObjects = [
     {id:4, imagePath: 'imgs/card-AceSpades.png' },
 ]
 
+let aceId = 4
+
 const backImagePath = 'imgs/card-back-blue.png';
 const cardContainer = document.querySelector(".card-container");
-
+const scoreContainerElem = document.querySelector(".header-score-container")
+const scoreElem = document.querySelector(".score")
+const roundContainerElem = document.querySelector(".header-round-container")
+const roundElem = document.querySelector(".round")
 
 let cards = []
+let gameInProgress = false
+let shuffleInProgress = false
+let cardsRevealed = false
+
+const currentGameStatusElem = document.querySelector('.current-game-status')
+const winColor = "green"
+const loseColor = "red"
+const primaryColor = "black"
+
 
 const playGameButton = document.getElementById('playGame');
 const collapsedGridAreaTemplate = '"a a" "a a"';
@@ -18,6 +32,10 @@ const cardCollectionCellClass = ".card-pos-a";
 const numberOfCards = CardsCollectionObjects.length;
 const cardPositions = [];
 
+
+let roundNum = 0
+let maxRound = 4
+let score = 0
 /*
     A função escrita abaixo (createCard) tem o intuito de criar a estrutura HTML abaixo.
     
@@ -36,7 +54,69 @@ const cardPositions = [];
 
 loadGame()
 
+function chooseCard(card) {
 
+    if(canChooseCard()){
+        evaluateChooseedCard(card);
+    }
+
+}
+
+function calculateScore(){
+    const scoreToAdd = calculateScoreToAdd(roundNum);
+    score += scoreToAdd;
+}
+
+function calculateScoreToAdd(roundNum){
+    if(roundNum == 1) {
+        return 100
+    }
+    else if(roundNum == 2){
+        return 50
+    }
+    else if(roundNum == 3){
+        return 25
+    }
+    else{
+        return 10
+    }
+}
+
+function updateScore(){
+    calculateScore();
+}
+
+
+function canChooseCard(){
+    return gameInProgress == true && !shuffleInProgress && !cardsRevealed
+}
+
+function updateStatusElement(elem, display, color, innerHTML){
+    elem.style.display = display
+    if(arguments.length > 2){
+        elem.style.color = color
+        elem.syle.color = innerHTML
+    }
+}
+
+function outputChoiceFeedBack(hit){
+    if(hit){
+        updateStatusElement(currentGameStatusElem, "block", winColor, "ACERTOU! - Muito bem!")
+    } else {
+        updateStatusElement(currentGameStatusElem, "block", loseColor, "Errou...")
+    }
+}
+
+
+function evaluateChooseedCard(choice){
+
+    if (choice.id == aceId) {
+        updateScore()
+        outputChoiceFeedBack(true)
+    } else {
+        outputChoiceFeedBack(false)
+    }
+}
 
 function loadGame(){
     createCards()
@@ -54,22 +134,33 @@ function StartGame() {
 }
 
 function initializeNewGame() {
+    score = 0
+    roundNum = 0
 
+    shuffleInProgress = false
 }
 
 function startRound() {
     initializeNewRound();
     colectCards();
-    //flipAllCards(true);
+    flipAllCards(true);
     shuffleCards();
 
 }
 
 function initializeNewRound() {
+    roundNum++
+    playGameButton.disabled = true
 
+    gameInProgress = true
+    shuffleInProgress = true
+    cardsRevealed = false
+
+    updateStatusElement(currentGameStatusElem, "block", primaryColor, "embaralhando...")
     
 
 }
+
 
 function colectCards(){
     transformGridArea(collapsedGridAreaTemplate);
@@ -147,35 +238,46 @@ function randomizeCardsPositions(){
 
 function dealCards(){
     addCardsToAppropriateCell();
-    const areaTemplate = returnGridAreasMappedToCardOriginalPos();
+    const areaTemplate = returnGridAreasMappedToCardPos();
+    console.log(typeof areaTemplate)
     console.log(areaTemplate)
     transformGridArea(areaTemplate);
 }
 
-function returnGridAreasMappedToCardOriginalPos() {
-    let firstPartOfTheMapString = ""
-    let secondPartOfTheMapString = ""
+function returnGridAreasMappedToCardPos()
+{
+    let firstPart = ""
+    let secondPart = ""
     let areas = ""
 
     cards.forEach((card, index) => {
         if(cardPositions[index] == 1){
-            areas += "a ";
-        }else if(cardPositions[index] == 2){
-            areas += "b ";
-        }else if(cardPositions[index] == 3){
-            areas += "c ";
-        }else if(cardPositions[index] == 4){
-            areas += "d ";
-        }if(index == 1) {
-            firstPartOfTheMapString = areas.substring(0, areas.length - 1);
+            areas = areas + "a "
+        }
+        else if(cardPositions[index] == 2){
+            areas = areas + "b "
+        }
+        else if (cardPositions[index] == 3){
+            areas = areas + "c "
+        }
+        else if (cardPositions[index] == 4){
+            areas = areas + "d "
+        }
+        if (index == 1){
+            firstPart = areas.substring(0, areas.length - 1)
             areas = "";
-        } else if (index == 3) {
-            secondPartOfTheMapString = areas.substring(0, areas.length - 1);
+        }
+        else if (index == 3){
+            secondPart = areas.substring(0, areas.length - 1)
         }
 
-        return `"${firstPartOfTheMapString}" "${secondPartOfTheMapString}"`
     })
+
+    return `"${firstPart}" "${secondPart}"`
+
+
 }
+
 
 function addCardsToAppropriateCell(){
     cards.forEach((card) => {
