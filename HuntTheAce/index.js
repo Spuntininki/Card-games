@@ -9,10 +9,6 @@ let aceId = 4
 
 const backImagePath = 'imgs/card-back-blue.png';
 const cardContainer = document.querySelector(".card-container");
-const scoreContainerElem = document.querySelector(".header-score-container")
-const scoreElem = document.querySelector(".score")
-const roundContainerElem = document.querySelector(".header-round-container")
-const roundElem = document.querySelector(".round")
 
 let cards = []
 let gameInProgress = false
@@ -20,6 +16,11 @@ let shuffleInProgress = false
 let cardsRevealed = false
 
 const currentGameStatusElem = document.querySelector('.current-game-status')
+const scoreContainerElem = document.querySelector(".header-score-container")
+const scoreElem = document.querySelector(".score")
+const roundContainerElem = document.querySelector(".header-round-container")
+const roundElem = document.querySelector(".round")
+
 const winColor = "green"
 const loseColor = "red"
 const primaryColor = "black"
@@ -58,9 +59,23 @@ function chooseCard(card) {
 
     if(canChooseCard()){
         evaluateChooseedCard(card);
+        flipCard(card, false)
+
+
+        setTimeout(() => {
+            flipAllCards(false)
+            updateStatusElement(currentGameStatusElem, "block", primaryColor, "Posição das cartas reveladas");
+        }, 3000)
+        cardsRevealed = true
+        setTimeout(() => {
+            updateStatusElement(currentGameStatusElem, "block", primaryColor, "Clique em 'jogar' para iniciar um novo round")
+        }, 80000)
+        playGameButton.disabled = false
     }
 
 }
+
+
 
 function calculateScore(){
     const scoreToAdd = calculateScoreToAdd(roundNum);
@@ -95,15 +110,17 @@ function updateStatusElement(elem, display, color, innerHTML){
     elem.style.display = display
     if(arguments.length > 2){
         elem.style.color = color
-        elem.syle.color = innerHTML
+        elem.innerHTML = innerHTML
     }
 }
 
 function outputChoiceFeedBack(hit){
     if(hit){
-        updateStatusElement(currentGameStatusElem, "block", winColor, "ACERTOU! - Muito bem!")
+        updateStatusElement(currentGameStatusElem, "block", winColor, "ACERTOU! - Muito bem!");
+        calculateScore();
+        updateStatusElement(scoreElem, "block", primaryColor, `Score <span class = 'badge'>${score}</span>`);
     } else {
-        updateStatusElement(currentGameStatusElem, "block", loseColor, "Errou...")
+        updateStatusElement(currentGameStatusElem, "block", loseColor, "Errou...");
     }
 }
 
@@ -138,6 +155,12 @@ function initializeNewGame() {
     roundNum = 0
 
     shuffleInProgress = false
+
+    updateStatusElement(scoreContainerElem, "flex");
+    updateStatusElement(roundContainerElem, "flex");
+    console.log(scoreElem)
+    updateStatusElement(scoreElem, "block", primaryColor, `Score <span class = 'badge'>${score}</span>`)
+    updateStatusElement(roundElem, "block", primaryColor, `Round <span class='badge'>${roundNum}<span>`)
 }
 
 function startRound() {
@@ -157,7 +180,7 @@ function initializeNewRound() {
     cardsRevealed = false
 
     updateStatusElement(currentGameStatusElem, "block", primaryColor, "embaralhando...")
-    
+    updateStatusElement(roundElem, "block", primaryColor, `Round <span class='badge'>${roundNum}<span>`)
 
 }
 
@@ -179,10 +202,12 @@ function flipCard(card, flipToBack) {
     if (flipToBack && !innerCardElem.classList.contains('flip-it'))
     {
         innerCardElem.classList.add('flip-it');
+        cardsRevealed = false
         
     }
     else if(innerCardElem.classList.contains('flip-it')) {
         innerCardElem.classList.remove('flip-it');
+        cardsRevealed = true
     }
 
 }
@@ -211,11 +236,13 @@ function shuffleCards(){
 
     function shuffle(){
         randomizeCardsPositions();
-
+        shuffleInProgress = true
 
         if(shuffleCount == 500){
             clearInterval(shuffleInterval);
             dealCards();
+            shuffleInProgress = false
+            updateStatusElement(currentGameStatusElem, "block", primaryColor, "Tente advinhar onde está o Ás de espada clicando em uma das cartas.")
         }
         else {
             shuffleCount++;
@@ -343,7 +370,15 @@ function createCard(cardItem) {
 
     initializeCardPositions(cardElem);
 
+    attatchClickEventHandlerToCard(cardElem);
+
 }
+
+function attatchClickEventHandlerToCard(card){
+    card.addEventListener('click', () => chooseCard(card))
+}
+
+
 function initializeCardPositions(card){
     cardPositions.push(card.id)
     
