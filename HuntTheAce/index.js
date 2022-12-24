@@ -55,22 +55,48 @@ let score = 0
 
 loadGame()
 
+
+function gameOver(){
+    updateStatusElement(scoreContainerElem, "none");
+    updateStatusElement(roundContainerElem, "none");
+
+    const gameOverMessage = `O jogo acabou! aperte em "jogar" para começar novamente.`
+    updateStatusElement(currentGameStatusElem, "block", primaryColor, gameOverMessage)
+    gameInProgress = false
+    playGameButton.disabled = false
+
+}
+
+function endRound() {
+
+
+    setTimeout(() => {
+        if(roundNum == maxRound)
+        {
+            gameOver();
+            return
+        }else {
+            startRound();
+        }
+    }, 10000)
+
+}
+
 function chooseCard(card) {
 
     if(canChooseCard()){
         evaluateChooseedCard(card);
         flipCard(card, false)
 
-
+        
         setTimeout(() => {
             flipAllCards(false)
+            
             updateStatusElement(currentGameStatusElem, "block", primaryColor, "Posição das cartas reveladas");
-        }, 3000)
+        }, 4000)
+        endRound();
         cardsRevealed = true
-        setTimeout(() => {
-            updateStatusElement(currentGameStatusElem, "block", primaryColor, "Clique em 'jogar' para iniciar um novo round")
-        }, 80000)
-        playGameButton.disabled = false
+
     }
 
 }
@@ -99,6 +125,7 @@ function calculateScoreToAdd(roundNum){
 
 function updateScore(){
     calculateScore();
+    updateStatusElement(scoreElem, "block", primaryColor, `Score <span class = 'badge'>${score}</span>`);
 }
 
 
@@ -118,7 +145,7 @@ function outputChoiceFeedBack(hit){
     if(hit){
         updateStatusElement(currentGameStatusElem, "block", winColor, "ACERTOU! - Muito bem!");
         calculateScore();
-        updateStatusElement(scoreElem, "block", primaryColor, `Score <span class = 'badge'>${score}</span>`);
+        
     } else {
         updateStatusElement(currentGameStatusElem, "block", loseColor, "Errou...");
     }
@@ -141,6 +168,9 @@ function loadGame(){
     cards = document.querySelectorAll('.card')
     console.log(cards)
     playGameButton.addEventListener("click", () => StartGame())
+
+    updateStatusElement(scoreContainerElem, "none")
+    updateStatusElement(roundContainerElem, "none")
 
 }
 
