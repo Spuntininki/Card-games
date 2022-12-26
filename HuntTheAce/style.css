@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand&display=swap');
+
 :root{
     --card-width:157px;
     --card-height: 220px;
@@ -8,6 +10,7 @@
     --primary-color: black;
     --secondary-color:#ffffff;
 
+    --primary-font: 'Quicksand', sans-serif;
 }
 
 .card-game-title {
@@ -16,6 +19,7 @@
 
 body{
     height: 100vh;
+    font-family: var(--primary-font);
 }
 
 main {
@@ -75,6 +79,7 @@ main {
     height: var(--card-height);
     perspective: 1000px;
     cursor: pointer;
+    transition: transform 0.6s;
 }
 
 .inner-card {
@@ -132,6 +137,11 @@ header {
     justify-content: space-evenly;
 }
 
+.current-game-status {
+    font-size: 1.5rem;
+    text-align: center;
+}
+
 .header-status-info-container,
 .header-button-container,
 .header-score-container,
@@ -166,8 +176,12 @@ header {
 
 }
 
+.game-play-button-container {
+    width: 150px;
+    height:70px ;
+}
 
-.play-game {
+#playGame {
   appearance: none;
   background-color: transparent;
   border: 2px solid #1A1A1A;
@@ -175,7 +189,7 @@ header {
   box-sizing: border-box;
   color: #3B3B3B;
   cursor: pointer;
-  display: inline-block;
+  display: none;
   font-family: Roobert,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
   font-size: 16px;
   font-weight: 600;
@@ -193,20 +207,44 @@ header {
   touch-action: manipulation;
   width: 100%;
   will-change: transform;
+  animation: game-play-button-fade-in 10s 1;
 }
 
-.play-game:disabled {
+#playGame:disabled {
   pointer-events: none;
 }
 
-.play-game:hover {
+#playGame:hover {
   color: #fff;
   background-color: #1A1A1A;
   box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
   transform: translateY(-2px);
 }
 
-.play-game:active {
+#playGame:active {
   box-shadow: none;
   transform: translateY(0);
+}
+
+@keyframes game-play-button-fade-in{
+    from {   
+        opacity: 0;   
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+
+.card.shuffle-left {
+    transform: translateX(300px) translateY(40px);
+    
+}
+
+.card.shuffle-right {
+    transform: translateX(0px) translateY(0px);
+}
+
+.card.fly-in {
+    transform: translateY(-1000px) translateX(-600px) rotate(45deg);
 }

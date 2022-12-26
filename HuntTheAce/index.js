@@ -166,6 +166,9 @@ function loadGame(){
     createCards()
 
     cards = document.querySelectorAll('.card')
+
+    cardFlyInEffect()
+
     console.log(cards)
     playGameButton.addEventListener("click", () => StartGame())
 
@@ -173,6 +176,7 @@ function loadGame(){
     updateStatusElement(roundContainerElem, "none")
 
 }
+
 
 
 function StartGame() {
@@ -250,6 +254,54 @@ function flipAllCards(flipToBack){
     })
 }
 
+function animateShuffle(shuffleCount) {
+    const random1 = Math.floor(Math.random() * numberOfCards) + 1
+    const random2 = Math.floor(Math.random() * numberOfCards) + 1
+
+    let card1 = document.getElementById(random1);
+    let card2 = document.getElementById(random2);
+
+
+    if (shuffleCount % 4 == 0){
+
+        card1.classList.toggle("shuffle-left");
+        card1.style.zIndex = 100
+
+    }
+    if (shuffleCount % 10 == 0){
+        card2.classList.toggle("shuffle-right");
+        card2.style.zIndex = 200
+    }
+}
+
+function cardFlyInEffect(){
+    const id = setInterval(flyIn, 5);
+    let cardCount = 0
+
+    let count = 0
+
+    function flyIn(){
+        count++
+        if(cardCount == numberOfCards){
+            clearInterval(id);
+            playGameButton.style.display = "inline-block"
+        }
+        if(count == 1 || count == 250 || count == 500 || count ==750){
+            cardCount++
+            let card = document.getElementById(cardCount);
+            card.classList.remove("fly-in");
+        }
+    }
+
+}   
+
+function removeShuffleClasses(){
+    cards.forEach((card) => {
+        card.classList.remove("shuffle-left");
+        card.classList.remove("shuffle-right");
+    })
+}
+
 function addCardsToShuffleArea(cellPositionName) {
     const cellPositionElem = document.querySelector(cellPositionName);
     console.log(cellPositionElem);
@@ -267,10 +319,12 @@ function shuffleCards(){
     function shuffle(){
         randomizeCardsPositions();
         shuffleInProgress = true
+        animateShuffle(shuffleCount);
 
         if(shuffleCount == 500){
             clearInterval(shuffleInterval);
             dealCards();
+            removeShuffleClasses();
             shuffleInProgress = false
             updateStatusElement(currentGameStatusElem, "block", primaryColor, "Tente advinhar onde está o Ás de espada clicando em uma das cartas.")
         }
@@ -365,6 +419,7 @@ function createCard(cardItem) {
 
     //adciona uma classe e um id para as tags criadas dinamicamente.
     addClassToElement(cardElem, 'card');
+    addClassToElement(cardElem, 'fly-in');
     addIdToElement(cardElem, cardItem.id);
     
     addClassToElement(innerCardElem, 'inner-card');
