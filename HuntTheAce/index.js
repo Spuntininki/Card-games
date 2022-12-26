@@ -37,6 +37,13 @@ const cardPositions = [];
 let roundNum = 0
 let maxRound = 4
 let score = 0
+
+
+let gameObj = {}
+
+
+const localStorageGameKey = "HTA"
+
 /*
     A função escrita abaixo (createCard) tem o intuito de criar a estrutura HTML abaixo.
     
@@ -86,6 +93,7 @@ function chooseCard(card) {
 
     if(canChooseCard()){
         evaluateChooseedCard(card);
+        saveGameObjectToLocalStorage(score, roundNum)
         flipCard(card, false)
 
         
@@ -177,7 +185,20 @@ function loadGame(){
 
 }
 
-
+function CheckForIncompleteGame(){
+    const serializedGameObj = getLocalStorageItemValue(localStorageGameKey);
+    if(serializedGameObj){
+        gameObj = getObjectFromJSON(serializedGameObj);
+        if(gameObj.roundNum >= maxRound){
+            removeLocalStorageItem(localStorageGameKey)
+        }else {
+            if (confirm('gostaria de continuar o seu ultimo jogo?')){
+                score = gameObj.score
+                roundNum = gameObj.roundNum
+            }
+        }
+    }
+}
 
 function StartGame() {
     initializeNewGame();
@@ -187,6 +208,8 @@ function StartGame() {
 function initializeNewGame() {
     score = 0
     roundNum = 0
+
+    CheckForIncompleteGame();
 
     shuffleInProgress = false
 
@@ -509,4 +532,36 @@ function mapCardIdToGridCell(card) {
     else if(card.id == 4) {
         return '.card-pos-d';
     }
+}
+
+
+//local storage functions
+
+
+function getSerializedObjectAsJSON(obj){
+    return JSON.stringify(obj);
+}
+function getObjectFromJSON(json){
+    return JSON.parse(json);
+}
+function updateLocalStorageItem(key, value){
+    localStorage.setItem(key, value);
+}
+function removeLocalStorageItem(key){
+    localStorage.removeItem(key);
+}
+function getLocalStorageItemValue(key){
+    return localStorage.getItem(key);
+}
+
+function updateGameObject(score, round){
+    gameObj.score = score
+    gameObj.roundNum = round
+
+}
+
+function saveGameObjectToLocalStorage(score, round){
+
+    updateGameObject(score, round);
+    updateLocalStorageItem(localStorageGameKey, getSerializedObjectAsJSON(gameObj));
 }
